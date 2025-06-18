@@ -1,5 +1,14 @@
 <template>
+  
+    <!-- Huellitas decorativas -->
+    <span class="paw paw-top-right"></span>
+    <span class="paw paw-bottom-right"></span>
+    <span class="paw paw-center-top"></span>
+    <span class="paw paw-bottom-left"></span>
+    <span class="paw paw-center-bottom"></span>
   <div class="carrusel">
+
+
     <div class="imagenes-triple">
       <div 
         v-for="(servicio, index) in servicios" 
@@ -10,7 +19,6 @@
         <img :src="servicio.src" :alt="servicio.texto" />
         <div class="texto-sobre-imagen">{{ servicio.texto }}</div>
       </div>
-      
     </div>
 
     <div class="navegacion">
@@ -22,7 +30,6 @@
       >●</span>
     </div>
 
-    <!-- Ocultar flechas cuando el modal está abierto -->
     <button 
       v-if="!modalAbierto" 
       class="flecha izq" 
@@ -34,7 +41,6 @@
       @click="siguiente"
     >›</button>
 
-    <!-- Modal solo se muestra si hay servicio seleccionado -->
     <ModalServicio 
       v-if="modalAbierto" 
       :item="servicioSeleccionado" 
@@ -45,6 +51,7 @@
 
 <script>
 import ModalServicio from './ModalServicio.vue'
+import pawPrint from '/src/assets/HuellitaAzul.png'  // Importa la imagen de huellita
 
 export default {
   name: 'Carrusel',
@@ -131,17 +138,17 @@ export default {
   },
   methods: {
     siguiente() {
-      if (this.modalAbierto) return; // No hacer nada si el modal está abierto
+      if (this.modalAbierto) return;
       this.actual = (this.actual + 1) % this.servicios.length;
       this.reiniciarIntervalo();
     },
     anterior() {
-      if (this.modalAbierto) return; // No hacer nada si el modal está abierto
+      if (this.modalAbierto) return;
       this.actual = (this.actual - 1 + this.servicios.length) % this.servicios.length;
       this.reiniciarIntervalo();
     },
     irA(index) {
-      if (this.modalAbierto) return; // No hacer nada si el modal está abierto
+      if (this.modalAbierto) return;
       this.actual = index;
       this.reiniciarIntervalo();
     },
@@ -175,6 +182,8 @@ export default {
     }
   },
   mounted() {
+    // Setear la variable CSS --paw-print con la ruta de la imagen importada
+    document.documentElement.style.setProperty('--paw-print', `url(${pawPrint})`);
     this.iniciarAuto();
   },
   beforeUnmount() {
@@ -190,10 +199,13 @@ export default {
   margin: auto;
   overflow: visible;
   text-align: center;
-  height: 480px; /* espacio suficiente para el carrusel */
+  height: 480px;
   user-select: none;
-  padding: 0 10px; /* algo de margen lateral en pantallas pequeñas */
+  padding: 0 10px;
+  background-color: white;
 }
+
+
 
 .imagenes-triple {
   position: relative;
@@ -225,7 +237,6 @@ export default {
   user-select: none;
 }
 
-/* Posición central: imagen más grande y frontal */
 .central {
   left: 50%;
   transform: translateX(-50%) scale(1) translateZ(0);
@@ -234,124 +245,126 @@ export default {
   box-shadow: 0 15px 30px rgba(0,0,0,0.4);
 }
 
-/* Imagen izquierda */
 .izquierda {
   left: 20%;
   transform: translateX(-50%) scale(0.7) translateZ(-100px) rotateY(25deg);
   opacity: 0.6;
   z-index: 5;
-  filter: brightness(0.85);
+  filter: grayscale(20%);
 }
 
-/* Imagen derecha */
 .derecha {
   left: 80%;
   transform: translateX(-50%) scale(0.7) translateZ(-100px) rotateY(-25deg);
   opacity: 0.6;
   z-index: 5;
-  filter: brightness(0.85);
+  filter: grayscale(20%);
 }
 
 .oculto {
   opacity: 0;
   pointer-events: none;
-  transform: scale(0);
-  width: 0;
-  height: 0;
+  transform: scale(0) translateZ(-200px);
+  z-index: 0;
 }
 
-/* Texto sobre la imagen */
 .texto-sobre-imagen {
   position: absolute;
-  bottom: 0;
+  bottom: 15px;
   width: 100%;
-  background: rgba(0,0,0,0.5);
   color: white;
-  font-weight: bold;
+  font-weight: 700;
   font-size: 1.4rem;
-  padding: 10px;
-  border-radius: 0 0 10px 10px;
+  text-shadow: 0 0 5px #000;
   user-select: none;
-  transition: background 0.3s;
 }
 
-.texto-sobre-imagen:hover {
-  background: rgba(0,0,0,0.7);
-}
-
+/* Navegación puntos */
 .navegacion {
-  margin-top: 20px;
+  margin-top: 10px;
   user-select: none;
 }
 
-.punto {
-  font-size: 2rem;
-  margin: 0 5px;
+.navegacion .punto {
   cursor: pointer;
-  color: #ccc;
-  transition: color 0.3s;
+  font-size: 1.5rem;
+  margin: 0 4px;
+  color: #888;
+  transition: color 0.3s ease;
 }
 
-.punto.activo {
-  color: #00aaff;
+.navegacion .activo {
+  color: #2196f3;
 }
 
+/* Flechas */
 .flecha {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
   font-size: 3rem;
-  color: #00aaff;
-  background: transparent;
+  color: #2196f3;
   border: none;
+  background: none;
   cursor: pointer;
   user-select: none;
-  transition: color 0.3s;
   z-index: 20;
+  transition: color 0.3s ease;
 }
 
 .flecha:hover {
-  color: #0077cc;
+  color: #0b7dda;
 }
 
 .flecha.izq {
-  left: 5px;
+  left: 10px;
 }
 
 .flecha.der {
-  right: 5px;
+  right: 10px;
 }
 
-/* ======== MEDIA QUERIES PARA RESPONSIVIDAD ======== */
 
-/* Ajuste para pantallas medianas (tablets) */
-@media (max-width: 900px) {
-  .carrusel {
-    height: 360px;
-  }
-  .imagenes-triple > div {
-    width: 220px;
-    height: 330px;
-  }
-  .texto-sobre-imagen {
-    font-size: 1.2rem;
-  }
+/* Huellitas */
+.paw {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  background-image: var(--paw-print);
+  background-repeat: no-repeat;
+  background-size: contain;
+  pointer-events: none;
+  z-index: 0;
 }
 
-/* Ajuste para móviles pequeños */
-@media (max-width: 600px) {
-  .carrusel {
-    height: 280px;
-  }
-  .imagenes-triple > div {
-    width: 150px;
-    height: 225px;
-  }
-  .texto-sobre-imagen {
-    font-size: 1rem;
-  }
-  .flecha {
-    font-size: 2rem;
-  }
+.paw-top-right {
+  top: 60px;     /* más abajo (antes estaba sin unidad: 30 -> 80px) */
+  right: 150px;   /* más hacia la izquierda (mayor valor en right = más al centro) */
+  transform: rotate(-45deg);
+}
+
+.paw-bottom-right {
+  bottom: 50px;
+  right: 150px;
+  transform: rotate(-20deg);
+}
+
+.paw-bottom-left {
+  bottom: 120px;
+  left: 70px;
+  transform: rotate(-25deg);
+}
+
+.paw-center-top {
+  top: 40%;
+  left: 80px;
+  transform: translateY(-145%) rotate(45deg);
+}
+
+
+.paw-center-bottom {
+  bottom: 30px;
+  right: 50%;
+  transform: translateX(-50%) rotate(50deg);
 }
 </style>

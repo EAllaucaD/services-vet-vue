@@ -3,7 +3,7 @@
     <div class="contenido-modal" @click.stop>
       <button class="cerrar" @click="$emit('cerrar')">✕</button>
       <h2>{{ item.texto }}</h2>
-      <img :src="item.src" :alt="item.texto" />
+      <!-- <img :src="item.src" :alt="item.texto" /> -->
       <p class="descripcion">{{ item.descripcion }}</p>
       <ul>
         <li v-for="(detalle, index) in item.detalles" :key="index">
