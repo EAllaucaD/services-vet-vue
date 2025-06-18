@@ -10,6 +10,7 @@
         <img :src="servicio.src" :alt="servicio.texto" />
         <div class="texto-sobre-imagen">{{ servicio.texto }}</div>
       </div>
+      
     </div>
 
     <div class="navegacion">
@@ -21,21 +22,39 @@
       >●</span>
     </div>
 
-    <button class="flecha izq" @click="anterior">‹</button>
-    <button class="flecha der" @click="siguiente">›</button>
+    <!-- Ocultar flechas cuando el modal está abierto -->
+    <button 
+      v-if="!modalAbierto" 
+      class="flecha izq" 
+      @click="anterior"
+    >‹</button>
+    <button 
+      v-if="!modalAbierto" 
+      class="flecha der" 
+      @click="siguiente"
+    >›</button>
+
+    <!-- Modal solo se muestra si hay servicio seleccionado -->
+    <ModalServicio 
+      v-if="modalAbierto" 
+      :item="servicioSeleccionado" 
+      @cerrar="cerrarModal" 
+    />
   </div>
 </template>
 
 <script>
+import ModalServicio from './ModalServicio.vue'
+
 export default {
   name: 'Carrusel',
-  props: {
-    modalAbierto: Boolean
-  },
+  components: { ModalServicio },
   data() {
     return {
       actual: 0,
       intervalId: null,
+      modalAbierto: false,
+      servicioSeleccionado: null,
       servicios: [
         {
           src: '/img/Vet.jpg',
@@ -112,19 +131,29 @@ export default {
   },
   methods: {
     siguiente() {
+      if (this.modalAbierto) return; // No hacer nada si el modal está abierto
       this.actual = (this.actual + 1) % this.servicios.length;
       this.reiniciarIntervalo();
     },
     anterior() {
+      if (this.modalAbierto) return; // No hacer nada si el modal está abierto
       this.actual = (this.actual - 1 + this.servicios.length) % this.servicios.length;
       this.reiniciarIntervalo();
     },
     irA(index) {
+      if (this.modalAbierto) return; // No hacer nada si el modal está abierto
       this.actual = index;
       this.reiniciarIntervalo();
     },
-    seleccionar(item) {
-      this.$emit('seleccionar', item);
+    seleccionar(servicio) {
+      this.servicioSeleccionado = servicio;
+      this.modalAbierto = true;
+      this.reiniciarIntervalo();
+    },
+    cerrarModal() {
+      this.modalAbierto = false;
+      this.servicioSeleccionado = null;
+      this.reiniciarIntervalo();
     },
     iniciarAuto() {
       this.intervalId = setInterval(() => {
@@ -132,20 +161,17 @@ export default {
       }, 4000);
     },
     reiniciarIntervalo() {
-      if (this.intervalId) {
-        clearInterval(this.intervalId);
-      }
+      if (this.intervalId) clearInterval(this.intervalId);
       this.iniciarAuto();
     },
     clasePosicion(index) {
-      // índice anterior y siguiente, con wrap-around
       const anterior = (this.actual - 1 + this.servicios.length) % this.servicios.length;
       const siguiente = (this.actual + 1) % this.servicios.length;
 
       if (index === this.actual) return 'central';
       if (index === anterior) return 'izquierda';
       if (index === siguiente) return 'derecha';
-      return 'oculto'; // los demás no se muestran
+      return 'oculto';
     }
   },
   mounted() {
@@ -166,12 +192,13 @@ export default {
   text-align: center;
   height: 480px; /* espacio suficiente para el carrusel */
   user-select: none;
+  padding: 0 10px; /* algo de margen lateral en pantallas pequeñas */
 }
 
 .imagenes-triple {
   position: relative;
   height: 450px;
-  perspective: 1000px; /* da un efecto 3D */
+  perspective: 1000px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -207,7 +234,7 @@ export default {
   box-shadow: 0 15px 30px rgba(0,0,0,0.4);
 }
 
-/* Imagen izquierda: más pequeña, ligeramente hacia la izquierda, algo rotada */
+/* Imagen izquierda */
 .izquierda {
   left: 20%;
   transform: translateX(-50%) scale(0.7) translateZ(-100px) rotateY(25deg);
@@ -216,7 +243,7 @@ export default {
   filter: brightness(0.85);
 }
 
-/* Imagen derecha: más pequeña, ligeramente hacia la derecha, algo rotada */
+/* Imagen derecha */
 .derecha {
   left: 80%;
   transform: translateX(-50%) scale(0.7) translateZ(-100px) rotateY(-25deg);
@@ -225,7 +252,6 @@ export default {
   filter: brightness(0.85);
 }
 
-/* Oculto los demás */
 .oculto {
   opacity: 0;
   pointer-events: none;
@@ -294,5 +320,38 @@ export default {
 
 .flecha.der {
   right: 5px;
+}
+
+/* ======== MEDIA QUERIES PARA RESPONSIVIDAD ======== */
+
+/* Ajuste para pantallas medianas (tablets) */
+@media (max-width: 900px) {
+  .carrusel {
+    height: 360px;
+  }
+  .imagenes-triple > div {
+    width: 220px;
+    height: 330px;
+  }
+  .texto-sobre-imagen {
+    font-size: 1.2rem;
+  }
+}
+
+/* Ajuste para móviles pequeños */
+@media (max-width: 600px) {
+  .carrusel {
+    height: 280px;
+  }
+  .imagenes-triple > div {
+    width: 150px;
+    height: 225px;
+  }
+  .texto-sobre-imagen {
+    font-size: 1rem;
+  }
+  .flecha {
+    font-size: 2rem;
+  }
 }
 </style>

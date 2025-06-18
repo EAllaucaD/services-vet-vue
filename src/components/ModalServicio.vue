@@ -1,12 +1,15 @@
 <template>
-  <div class="modal-fondo" @click.self="$emit('cerrar')">
-    <div class="modal">
-      <h3 class="titulo-modal">{{ item.texto }}</h3>
+  <div class="modal" @click="cerrarModalPorFondo">
+    <div class="contenido-modal" @click.stop>
+      <button class="cerrar" @click="$emit('cerrar')">✕</button>
+      <h2>{{ item.texto }}</h2>
+      <img :src="item.src" :alt="item.texto" />
       <p class="descripcion">{{ item.descripcion }}</p>
       <ul>
-        <li v-for="(detalle, i) in item.detalles" :key="i">{{ detalle }}</li>
+        <li v-for="(detalle, index) in item.detalles" :key="index">
+          {{ detalle }}
+        </li>
       </ul>
-      <button @click="$emit('cerrar')">Cerrar</button>
     </div>
   </div>
 </template>
@@ -15,66 +18,101 @@
 export default {
   name: 'ModalServicio',
   props: {
-    item: Object
+    item: {
+      type: Object,
+      required: true
+    }
+  },
+  methods: {
+    cerrarModalPorFondo(event) {
+      // Emitimos evento para cerrar solo si el clic fue en el fondo (modal), no en el contenido
+      this.$emit('cerrar');
+    }
   }
 }
 </script>
 
 <style scoped>
-.modal-fondo {
+.modal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(0,0,0,0.7);
   display: flex;
   justify-content: center;
-  align-items: center; /* ← CAMBIO IMPORTANTE */
-  z-index: 1000;
+  align-items: center;
+  z-index: 50;
+  user-select: none;
 }
 
-.modal {
-  background-color: white;
-  padding: 25px 30px;
+.contenido-modal {
+  background: white;
+  padding: 25px 40px;
   border-radius: 12px;
-  max-width: 400px;
+  max-width: 600px;
   width: 90%;
-  color: #00aaff;
-  font-family: Arial, sans-serif;
   text-align: center;
+  position: relative;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
 }
 
-.titulo-modal {
-  margin-top: 0;
-  margin-bottom: 15px;
-  font-size: 1.5rem;
+.cerrar {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: transparent;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: #444;
+  user-select: none;
+  transition: color 0.3s;
 }
 
-.descripcion {
-  margin-bottom: 15px;
+.cerrar:hover {
+  color: #0077cc;
 }
 
-.modal ul {
-  list-style: none;
-  padding-left: 0;
+.contenido-modal h2 {
+  margin-bottom: 20px;
+  font-weight: 700;
+  font-size: 2.4rem;
+  color: #005f99;
+}
+
+.contenido-modal img {
+  max-width: 100%;
+  max-height: 250px;
+  object-fit: cover;
+  border-radius: 8px;
   margin-bottom: 20px;
 }
 
-.modal ul li {
-  margin-bottom: 8px;
-  font-weight: 600;
+.descripcion {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 15px;
 }
 
-.modal button {
-  background-color: #00aaff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  font-weight: bold;
-  cursor: pointer;
-  display: block;
-  margin: 0 auto; /* Centra el botón */
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  font-size: 1.1rem;
+  margin: 8px 0;
+  color: #444;
+  text-align: left;
+  padding-left: 20px;
+  position: relative;
+}
+
+li::before {
+  content: '✔️';
+  position: absolute;
+  left: 0;
 }
 </style>
